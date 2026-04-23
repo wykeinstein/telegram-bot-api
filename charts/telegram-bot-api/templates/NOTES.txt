@@ -1,0 +1,18 @@
+1. Install the chart with required Telegram API credentials:
+
+   helm install {{ .Release.Name }} {{ .Chart.Name }} \
+     --set-string telegram.apiId=<your_api_id> \
+     --set-string telegram.apiHash=<your_api_hash>
+
+2. Get the service endpoint:
+{{- if contains "NodePort" .Values.service.type }}
+   export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "telegram-bot-api.fullname" . }})
+   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+   echo http://$NODE_IP:$NODE_PORT
+{{- else if contains "LoadBalancer" .Values.service.type }}
+   kubectl get svc --namespace {{ .Release.Namespace }} {{ include "telegram-bot-api.fullname" . }} -w
+{{- else }}
+   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "telegram-bot-api.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.service.port }}:{{ .Values.service.port }}
+   echo "Bot API available at http://127.0.0.1:{{ .Values.service.port }}"
+{{- end }}
