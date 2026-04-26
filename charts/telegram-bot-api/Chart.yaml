@@ -1,0 +1,15 @@
+apiVersion: v2
+name: telegram-bot-api
+description: Helm chart for deploying a self-hosted Telegram Bot API server
+type: application
+version: 0.1.2
+appVersion: "latest"
+keywords:
+  - telegram
+  - bot
+  - api
+home: https://github.com/tdlib/telegram-bot-api
+sources:
+  - https://github.com/tdlib/telegram-bot-api
+maintainers:
+  - name: telegram-bot-api
